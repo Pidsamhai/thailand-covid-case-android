@@ -1,28 +1,23 @@
 package com.oakraw.thailand_covid.ui.main
 
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.oakraw.thailand_covid.repository.ApiRepository
 import androidx.lifecycle.viewModelScope
-import com.haroldadmin.cnradapter.NetworkResponse
 import com.oakraw.thailand_covid.model.CaseInfo
+import com.oakraw.thailand_covid.network.Resource
+import com.oakraw.thailand_covid.repository.ApiRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
-class MainViewModel(val apiRepository: ApiRepository): ViewModel() {
-    val isLoading = MutableLiveData<Boolean>()
-    val todayCaseInfo = MutableLiveData<CaseInfo>()
+class MainViewModel(private val apiRepository: ApiRepository) : ViewModel() {
+    private val fetchKey = MutableStateFlow(System.currentTimeMillis())
+    val resource: Flow<Resource<CaseInfo>> = fetchKey.flatMapLatest {
+        apiRepository.getTodayCaseInfo()
+    }
 
-    fun fetch() {
-        viewModelScope.launch {
-            isLoading.value = true
-            val response = apiRepository.getTodayCaseInfo()
-            when (response) {
-                is NetworkResponse.Success -> {
-                    todayCaseInfo.postValue(response.body)
-                }
-            }
-            isLoading.value = false
-        }
+    fun refresh() = viewModelScope.launch(Dispatchers.IO) {
+        fetchKey.emit(System.currentTimeMillis())
     }
 }

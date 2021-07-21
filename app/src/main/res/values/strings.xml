@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">กี่คนแล้ว</string>
+    <string translatable="false" name="app_pref">app_pref</string>
 </resources>

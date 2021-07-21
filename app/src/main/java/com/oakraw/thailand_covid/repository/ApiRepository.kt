@@ -1,7 +1,9 @@
 package com.oakraw.thailand_covid.repository
 
-import com.oakraw.thailand_covid.network.ApiService
+import com.oakraw.thailand_covid.model.CaseInfo
+import com.oakraw.thailand_covid.network.Resource
+import kotlinx.coroutines.flow.Flow
 
-class ApiRepository(private val service: ApiService) {
-    suspend fun getTodayCaseInfo() = service.getTodayCaseInfo()
+interface ApiRepository {
+    fun getTodayCaseInfo(): Flow<Resource<CaseInfo>>
 }
